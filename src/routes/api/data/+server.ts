@@ -3,18 +3,17 @@ import moment from 'moment';
 import type { RequestEvent, RequestHandler } from './$types';
 import type { InfluxDBPoint, InfluxDBRow } from '$lib/types';
 import Papa from 'papaparse';
+import { INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_USER, INFLUXDB_PASSWORD } from '$env/static/private';
 
 export const GET: RequestHandler = async ({ params }: RequestEvent) => {
-	const url = `${process.env.INFLUXDB_URL}`;
-	const org = `${process.env.INFLUXDB_ORG}`;
-	const token = `${process.env.INFLUXDB_USER}:${process.env.INFLUXDB_PASSWORD}`;
+	const token = `${INFLUXDB_USER}:${INFLUXDB_PASSWORD}`;
 
 	const fluxQuery = `from(bucket:"db0") 
         |> range(start: -1d) 
         |> filter(fn: (r) => r._measurement == "temperature" or r._measurement == "humidity")
         |> movingAverage(n: 60)`;
 
-	return await fetch(`${url}/api/v2/query?org=${org}`, {
+	return await fetch(`${INFLUXDB_URL}/api/v2/query?org=${INFLUXDB_ORG}`, {
 		body: fluxQuery,
 		headers: {
 			Accept: 'application/csv',
@@ -27,7 +26,8 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 			return response.text();
 		})
 		.then((csv) => {
-			let dataPoints: { [time: string]: InfluxDBPoint } = {};
+			let temperature: InfluxDBPoint[] = [];
+			let humidity: InfluxDBPoint[] = [];
 
 			Papa.parse<InfluxDBRow>(csv, {
 				complete: (results) => {
@@ -41,41 +41,28 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 							continue;
 						}
 
-						const time = moment(row[5]);
-						if (!time.isValid()) {
-							continue;
-						}
+						const time = row[5];
 
-						const formattedTime = time.format('HH:mm');
 						const measurement = row[8];
 						switch (measurement) {
 							case 'temperature':
-								dataPoints[formattedTime] = {
-									time: formattedTime,
-									temperature: value,
-									humidity: dataPoints[formattedTime]?.humidity ?? ''
-								};
+								temperature.push({
+									time: time,
+									value: parseFloat(value)
+								});
 								break;
 							case 'humidity':
-								dataPoints[formattedTime] = {
-									time: formattedTime,
-									temperature: dataPoints[formattedTime]?.temperature ?? '',
-									humidity: value
-								};
+								humidity.push({
+									time: time,
+									value: parseFloat(value)
+								});
 								break;
-						}
-					}
-
-					// Remove data points where we don't have both the temperature and humidity.
-					for (const time in dataPoints) {
-						if (!dataPoints[time].temperature || !dataPoints[time].humidity) {
-							delete dataPoints[time];
 						}
 					}
 				}
 			});
 
-			return json({ dataPoints });
+			return json({ temperature, humidity });
 		})
 		.catch((err) => {
 			const message = `Failed to fetch data from InfluxDB: ${err}`;

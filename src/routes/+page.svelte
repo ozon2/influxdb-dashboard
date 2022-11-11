@@ -1,92 +1,90 @@
 <script lang="ts">
-import { Chart, registerables } from 'chart.js';
-import 'chartjs-adapter-moment';
-import { onMount } from 'svelte';
+	import type { InfluxDBPoint } from '$lib/types';
+	import Chart from './Chart.svelte';
+	import '@fontsource/roboto';
 
-Chart.register(...registerables);
+	const refreshPeriodSeconds = 60;
 
-let barChartElement: HTMLCanvasElement;
+	let data: { temperature: InfluxDBPoint[]; humidity: InfluxDBPoint[] } = {
+		temperature: [],
+		humidity: []
+	};
+	let err = '';
 
-onMount(() => {
-	new Chart(barChartElement, {
-		type: 'line',
-		data: {
-			datasets: [{
-				data: [{
-					x: '2021-11-06 23:39:30',
-					y: 50
-				}, {
-					x: '2021-11-07 01:00:28',
-					y: 60
-				}, {
-					x: '2021-11-07 09:00:28',
-					y: 20
-				}]
-        	}],
-		},
-		options: {
-			scales: {
-				x: {
-					type: 'time',
-				}
+	async function fetchData() {
+		try {
+			const response = await fetch('/api/data');
+			const jsonResponse = await response.json();
+
+			if (response.status != 200) {
+				err = jsonResponse.message ?? 'no error message';
+
+				return;
 			}
-    	}
-	})
-})
 
-let data = 0;
-let err = "";
+			data = jsonResponse;
+		} catch (error) {
+			const message = `Failed to fetch data from API: ${err}`;
+			console.log(message);
 
-async function fetchData() {
-	try {
-		const response = await fetch('/api/data');
-		const jsonResponse = await response.json()
+			err = message;
 
-		if (response.status != 200) {
-			err = jsonResponse.message ?? "else"
-
-			return
+			return;
 		}
-
-		data = jsonResponse
-	} catch (error) {
-		const message = `Failed to fetch data from API: ${err}`;
-		console.log(message);
-
-		err = message;
-		
-		return
 	}
-}
+
+	// First data fetch.
+	fetchData();
+
+	// Update the graph every refreshPeriodSeconds.
+	let clear: NodeJS.Timer;
+	$: {
+		clearInterval(clear);
+		clear = setInterval(fetchData, refreshPeriodSeconds * 1000);
+	}
+
+	let currentTemp = 0;
+
+	$: if (data.temperature.length > 0) {
+		currentTemp = data.temperature[data.temperature.length - 1].value;
+	}
+
+	let currentHumidity = 0;
+
+	$: if (data.humidity.length > 0) {
+		currentHumidity = data.humidity[data.humidity.length - 1].value;
+	}
 </script>
 
 <main class="main-container">
-	<h1>Home dashboard</h1>
+	<h1>🌡️ {currentTemp.toFixed(1)} °C 💧 {currentHumidity.toFixed(1)} %</h1>
 
-	<button on:click={fetchData}>Refresh</button>
+	<!-- TODO: One graph with both lines so it can be displayed on a tablet -->
+	<Chart points={data.temperature} title="Température" unit="°C" />
+	<Chart points={data.humidity} title="Humidité" unit="%" />
 
-	<section>
-		<canvas bind:this={barChartElement} />
-	</section>
-
-	<p>
-		Data: {data}
-	</p>
-
-	<p>
-		Error: {err}
-	</p>
+	{#if err}
+		<p>
+			Error: {err}
+		</p>
+	{/if}
 </main>
 
 <style>
+	:global(body) {
+		background-color: #121212;
+		color: #ffffff;
+		font-family: 'Roboto';
+	}
+
 	h1 {
-	  color: var(--colour-dark);
-	  font-size: 3rem;
+		color: var(--colour-dark);
+		font-size: 3rem;
+		text-align: center;
 	}
 
 	.main-container {
-	  width: min(100% - 3rem, 48rem);
-	  margin: 4.5rem auto;
+		width: min(100% - 3rem, 48rem);
+		margin: 4.5rem auto;
 	}
 </style>
-  

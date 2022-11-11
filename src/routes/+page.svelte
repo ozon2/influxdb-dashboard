@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type { InfluxDBPoint } from '$lib/types';
+	import type { InfluxDBPoint, ResponseData } from '$lib/types';
 	import Chart from './Chart.svelte';
 	import '@fontsource/roboto';
+	import { onMount } from 'svelte';
 
 	const refreshPeriodSeconds = 60;
 
-	let data: { temperature: InfluxDBPoint[]; humidity: InfluxDBPoint[] } = {
+	let data: ResponseData = {
 		temperature: [],
 		humidity: []
 	};
@@ -23,18 +24,22 @@
 			}
 
 			data = jsonResponse;
+			err = '';
 		} catch (error) {
-			const message = `Failed to fetch data from API: ${err}`;
-			console.log(message);
-
-			err = message;
+			err = `Failed to fetch data from API: ${error}`;
 
 			return;
+		}
+
+		if (err) {
+			console.log(err);
 		}
 	}
 
 	// First data fetch.
-	fetchData();
+	onMount(() => {
+		fetchData();
+	});
 
 	// Update the graph every refreshPeriodSeconds.
 	let clear: NodeJS.Timer;
@@ -56,19 +61,19 @@
 	}
 </script>
 
-<main class="main-container">
-	<h1>🌡️ {currentTemp.toFixed(1)} °C 💧 {currentHumidity.toFixed(1)} %</h1>
+<div class="main-container">
+	<h1>
+		🌡️ {currentTemp.toFixed(1)} °C <br class="mobile-break" />💧 {currentHumidity.toFixed(1)} %
+	</h1>
 
-	<!-- TODO: One graph with both lines so it can be displayed on a tablet -->
-	<Chart points={data.temperature} title="Température" unit="°C" />
-	<Chart points={data.humidity} title="Humidité" unit="%" />
+	<Chart {data} />
 
 	{#if err}
 		<p>
 			Error: {err}
 		</p>
 	{/if}
-</main>
+</div>
 
 <style>
 	:global(body) {
@@ -85,6 +90,13 @@
 
 	.main-container {
 		width: min(100% - 3rem, 48rem);
+		height: 50vh;
 		margin: 4.5rem auto;
+	}
+
+	@media screen and (min-width: 600px) {
+		.mobile-break {
+			display: none;
+		}
 	}
 </style>

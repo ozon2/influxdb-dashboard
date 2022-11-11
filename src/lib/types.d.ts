@@ -1,8 +1,8 @@
-export interface InfluxDBPoint {
+export type InfluxDBPoint = {
 	// Time with RFC3339 format.
 	time: string;
 	value: float;
-}
+};
 
 export type InfluxDBRow = [
 	datatype: string,
@@ -16,3 +16,8 @@ export type InfluxDBRow = [
 	field: string,
 	measurement: string
 ];
+
+export type ResponseData = {
+	temperature: InfluxDBPoint[];
+	humidity: InfluxDBPoint[];
+};

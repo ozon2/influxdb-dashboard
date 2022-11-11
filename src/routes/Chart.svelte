@@ -1,18 +1,17 @@
 <script lang="ts">
-	import type { InfluxDBPoint } from '$lib/types';
+	import type { InfluxDBPoint, ResponseData } from '$lib/types';
 	import Chart from 'chart.js/auto';
 	import 'chartjs-adapter-moment';
 	import { onMount } from 'svelte';
 
-	export let points: InfluxDBPoint[];
-	export let title: string;
-	export let unit: string;
+	export let data: ResponseData;
 
 	let chartElement: HTMLCanvasElement;
 	let chart: Chart<'line', InfluxDBPoint[], string>;
 
 	$: if (chart) {
-		chart.data.datasets[0].data = points;
+		chart.data.datasets[0].data = data.temperature;
+		chart.data.datasets[1].data = data.humidity;
 		chart.update();
 	}
 
@@ -20,17 +19,36 @@
 	Chart.defaults.color = '#ffffff';
 
 	onMount(() => {
+		// Show less ticks on the time axis on mobile devices.
+		const maxTicksLimit = window.screen.width < 600 ? 6 : 12;
+
 		chart = new Chart(chartElement, {
 			type: 'line',
 			data: {
 				datasets: [
 					{
-						data: points,
+						label: 'Température',
+						yAxisID: 'temperature',
+						data: data.temperature,
 						showLine: true,
 						// Line color,
-						borderColor: '#bb86fc',
+						borderColor: '#f03a17',
 						// Hide points.
-						pointRadius: 0
+						pointRadius: 0,
+						// Use Bezier curve for smoother lines.
+						tension: 1
+					},
+					{
+						label: 'Humidité',
+						yAxisID: 'humidity',
+						data: data.humidity,
+						showLine: true,
+						// Line color,
+						borderColor: '#00bcf2',
+						// Hide points.
+						pointRadius: 0,
+						// Use Bezier curve for smoother lines.
+						tension: 1
 					}
 				]
 			},
@@ -43,15 +61,26 @@
 						},
 						grid: {
 							color: '#ffffff'
+						},
+						ticks: {
+							maxTicksLimit: maxTicksLimit
 						}
 					},
-					y: {
+					temperature: {
+						position: 'left',
 						grid: {
 							color: '#ffffff'
 						},
 						title: {
 							display: true,
-							text: `${title} (${unit})`
+							text: `Température (°C)`
+						}
+					},
+					humidity: {
+						position: 'right',
+						title: {
+							display: true,
+							text: `Humidité (%)`
 						}
 					}
 				},
@@ -59,24 +88,10 @@
 					xAxisKey: 'time',
 					yAxisKey: 'value'
 				},
-				plugins: {
-					title: {
-						display: true,
-						text: title
-					},
-					legend: {
-						display: false
-					}
-				}
+				maintainAspectRatio: false
 			}
 		});
 	});
 </script>
 
 <canvas bind:this={chartElement} />
-
-<style>
-	canvas {
-		margin: 1em;
-	}
-</style>

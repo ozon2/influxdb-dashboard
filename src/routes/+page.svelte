@@ -1,7 +1,6 @@
 <script lang="ts">
-	import type { InfluxDBPoint, ResponseData } from '$lib/types';
+	import type { ResponseData } from '$lib/types';
 	import Chart from './Chart.svelte';
-	import '@fontsource/roboto';
 	import { onMount } from 'svelte';
 
 	const refreshPeriodSeconds = 60;

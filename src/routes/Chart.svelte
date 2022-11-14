@@ -3,6 +3,7 @@
 	import Chart from 'chart.js/auto';
 	import 'chartjs-adapter-moment';
 	import { onMount } from 'svelte';
+	import { _ } from 'svelte-i18n';
 
 	export let data: ResponseData;
 
@@ -27,7 +28,7 @@
 			data: {
 				datasets: [
 					{
-						label: 'Température',
+						label: $_('temperature'),
 						yAxisID: 'temperature',
 						data: data.temperature,
 						showLine: true,
@@ -39,7 +40,7 @@
 						tension: 1
 					},
 					{
-						label: 'Humidité',
+						label: $_('humidity'),
 						yAxisID: 'humidity',
 						data: data.humidity,
 						showLine: true,
@@ -73,14 +74,14 @@
 						},
 						title: {
 							display: true,
-							text: `Température (°C)`
+							text: `${$_('temperature')} (°C)`
 						}
 					},
 					humidity: {
 						position: 'right',
 						title: {
 							display: true,
-							text: `Humidité (%)`
+							text: `${$_('humidity')} (%)`
 						}
 					}
 				},

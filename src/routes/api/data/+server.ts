@@ -1,5 +1,4 @@
 import { json, error } from '@sveltejs/kit';
-import moment from 'moment';
 import type { RequestEvent, RequestHandler } from './$types';
 import type { InfluxDBPoint, InfluxDBRow } from '$lib/types';
 import Papa from 'papaparse';

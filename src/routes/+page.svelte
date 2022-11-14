@@ -76,10 +76,13 @@
 </div>
 
 <style>
+	/* Add Noto Color Emoji for emoji support on old browsers */
+	@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Roboto&display=swap');
+
 	:global(body) {
 		background-color: #121212;
 		color: #ffffff;
-		font-family: 'Roboto';
+		font-family: 'Roboto', 'Noto Color Emoji', sans-serif;
 	}
 
 	h1 {

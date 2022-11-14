@@ -35,7 +35,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@fontsource/roboto": "^4.5.8",
 		"chart.js": "^3.9.1",
 		"chartjs-adapter-moment": "^1.0.0",
 		"moment": "^2.29.4",

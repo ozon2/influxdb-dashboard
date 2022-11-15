@@ -2,6 +2,8 @@
 	import type { ResponseData } from '$lib/types';
 	import Chart from './Chart.svelte';
 	import { onMount } from 'svelte';
+	import thermometerIcon from '$lib/images/thermometer.png';
+	import dropletIcon from '$lib/images/droplet.png';
 
 	const refreshPeriodSeconds = 60;
 
@@ -62,7 +64,11 @@
 
 <div class="main-container">
 	<h1>
-		🌡️ {currentTemp.toFixed(1)} °C <br class="mobile-break" />💧 {currentHumidity.toFixed(1)} %
+		<img src={thermometerIcon} alt="" style="vertical-align:middle" />
+		{currentTemp.toFixed(1)} °C
+		<br class="mobile-break" />
+		<img src={dropletIcon} alt="" style="vertical-align:middle; margin-left: 1em" />
+		{currentHumidity.toFixed(1)} %
 	</h1>
 
 	<Chart {data} />
@@ -75,13 +81,13 @@
 </div>
 
 <style>
-	/* Add Noto Color Emoji for emoji support on old browsers */
-	@import url('https://fonts.googleapis.com/css2?family=Noto+Color+Emoji&family=Roboto&display=swap');
+	/* Use Roboto font. */
+	@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 	:global(body) {
 		background-color: #121212;
 		color: #ffffff;
-		font-family: 'Roboto', 'Noto Color Emoji', sans-serif;
+		font-family: 'Roboto', sans-serif;
 	}
 
 	h1 {

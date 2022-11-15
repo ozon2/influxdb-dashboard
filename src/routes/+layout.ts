@@ -8,10 +8,10 @@ addMessages('en', en);
 addMessages('fr', fr);
 
 if (browser) {
-	// init on client side only
-	// don't put this inside `load`, otherwise it will gets executed every time you changed route on client side
+	// Init on client side only. Don't put this inside `load`, otherwise
+	// it will gets executed every time you changed route on client side.
 	init({
-		fallbackLocale: 'en',
+		fallbackLocale: 'fr',
 		initialLocale: getLocaleFromNavigator()
 	});
 }

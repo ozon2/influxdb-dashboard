@@ -1,38 +1,55 @@
-# create-svelte
+# InfluxDB Dashboard
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+A simple dashboard to display a graph of temperature and humidity.
 
-## Creating a project
+<img src="src/lib/images/dashboard.png" style="height:400px">
 
-If you're seeing this, you've probably already done this step. Congrats!
+## Use case
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
+I have a DHT22 sensor connected to my Rasberry Pi and and I send the data to InfluxDB every minute.
+I wanted to display the temperature graph on an old tablet running Android 4 and couldn't use Grafana
+because the Chrome version on my tablet didn't support it.
 
-# create a new project in my-app
-npm create svelte@latest my-app
+## Setup
+
+You need an InfluxDB bucket with the humidity and temperature data in two separate measurements.
+
+Copy the `.env.example` file to `.env` and edit the variables with your InfluxDB server URL and credentials.
+
+```sh
+copy .env.example .env
 ```
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+Once you've created a project and installed dependencies with `npm install`, start a development server:
 
-```bash
+```sh
 npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
 ```
 
 ## Building
 
-To create a production version of your app:
+To create a production version of the app:
 
-```bash
+```sh
 npm run build
+```
+
+Or with docker:
+
+```sh
+docker build -t influxdb-dashboard .
 ```
 
 You can preview the production build with `npm run preview`.
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+## Running
+
+After the app is built, run it with Docker:
+
+```sh
+docker run -d -p 3000:3000 influxdb-dashboard
+```
+
+The dashboard will be accessible on http://localhost:3000.

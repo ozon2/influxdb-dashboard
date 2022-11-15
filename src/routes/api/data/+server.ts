@@ -2,14 +2,22 @@ import { json, error } from '@sveltejs/kit';
 import type { RequestEvent, RequestHandler } from './$types';
 import type { InfluxDBPoint, InfluxDBRow } from '$lib/types';
 import Papa from 'papaparse';
-import { INFLUXDB_URL, INFLUXDB_ORG, INFLUXDB_USER, INFLUXDB_PASSWORD } from '$env/static/private';
+import {
+	INFLUXDB_URL,
+	INFLUXDB_ORG,
+	INFLUXDB_USER,
+	INFLUXDB_PASSWORD,
+	INFLUXDB_BUCKET,
+	INFLUXDB_TEMPERATURE_MEASUREMENT,
+	INFLUXDB_HUMIDITY_MEASUREMENT
+} from '$env/static/private';
 
 export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 	const token = `${INFLUXDB_USER}:${INFLUXDB_PASSWORD}`;
 
-	const fluxQuery = `from(bucket:"db0") 
+	const fluxQuery = `from(bucket:"${INFLUXDB_BUCKET}") 
         |> range(start: -1d) 
-        |> filter(fn: (r) => r._measurement == "temperature" or r._measurement == "humidity")
+        |> filter(fn: (r) => r._measurement == "${INFLUXDB_TEMPERATURE_MEASUREMENT}" or r._measurement == "${INFLUXDB_HUMIDITY_MEASUREMENT}")
         |> movingAverage(n: 60)`;
 
 	return await fetch(`${INFLUXDB_URL}/api/v2/query?org=${INFLUXDB_ORG}`, {
@@ -44,13 +52,13 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 
 						const measurement = row[8];
 						switch (measurement) {
-							case 'temperature':
+							case INFLUXDB_TEMPERATURE_MEASUREMENT:
 								temperature.push({
 									time: time,
 									value: parseFloat(value)
 								});
 								break;
-							case 'humidity':
+							case INFLUXDB_HUMIDITY_MEASUREMENT:
 								humidity.push({
 									time: time,
 									value: parseFloat(value)

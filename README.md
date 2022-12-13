@@ -17,7 +17,7 @@ You need an InfluxDB bucket with the humidity and temperature data in two separa
 Copy the `.env.example` file to `.env` and edit the variables with your InfluxDB server URL and credentials.
 
 ```sh
-copy .env.example .env
+cp .env.example .env
 ```
 
 ## Developing

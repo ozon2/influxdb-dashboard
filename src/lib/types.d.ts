@@ -14,7 +14,8 @@ export type InfluxDBRow = [
 	time: string,
 	value: string,
 	field: string,
-	measurement: string
+	measurement: string,
+	tag_id: string
 ];
 
 export type ResponseData = {

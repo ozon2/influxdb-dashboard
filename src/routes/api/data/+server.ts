@@ -8,16 +8,17 @@ import {
 	INFLUXDB_USER,
 	INFLUXDB_PASSWORD,
 	INFLUXDB_BUCKET,
-	INFLUXDB_TEMPERATURE_MEASUREMENT,
-	INFLUXDB_HUMIDITY_MEASUREMENT
+	INFLUXDB_MEASUREMENT,
+	INFLUXDB_TEMPERATURE_FIELD,
+	INFLUXDB_HUMIDITY_FIELD
 } from '$env/static/private';
 
 export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 	const token = `${INFLUXDB_USER}:${INFLUXDB_PASSWORD}`;
 
 	const fluxQuery = `from(bucket:"${INFLUXDB_BUCKET}") 
-        |> range(start: -1d) 
-        |> filter(fn: (r) => r._measurement == "${INFLUXDB_TEMPERATURE_MEASUREMENT}" or r._measurement == "${INFLUXDB_HUMIDITY_MEASUREMENT}")
+        |> range(start: -1d)
+        |> filter(fn: (r) => r._measurement == "${INFLUXDB_MEASUREMENT}")
         |> movingAverage(n: 60)`;
 
 	return await fetch(`${INFLUXDB_URL}/api/v2/query?org=${INFLUXDB_ORG}`, {
@@ -39,7 +40,7 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 			Papa.parse<InfluxDBRow>(csv, {
 				complete: (results) => {
 					for (const row of results.data) {
-						if (!Array.isArray(row) || row.length !== 9) {
+						if (!Array.isArray(row) || row.length < 7) {
 							continue;
 						}
 
@@ -50,15 +51,15 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 
 						const time = row[5];
 
-						const measurement = row[8];
-						switch (measurement) {
-							case INFLUXDB_TEMPERATURE_MEASUREMENT:
+						const field = row[7];
+						switch (field) {
+							case INFLUXDB_TEMPERATURE_FIELD:
 								temperature.push({
 									time: time,
 									value: parseFloat(value)
 								});
 								break;
-							case INFLUXDB_HUMIDITY_MEASUREMENT:
+							case INFLUXDB_HUMIDITY_FIELD:
 								humidity.push({
 									time: time,
 									value: parseFloat(value)

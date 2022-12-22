@@ -2,8 +2,13 @@
 	import type { ResponseData } from '$lib/types';
 	import Chart from './Chart.svelte';
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import thermometerIcon from '$lib/images/thermometer.png';
 	import dropletIcon from '$lib/images/droplet.png';
+	import type { PageData } from './$types';
+
+	// Query parameters.
+	export let pageData: PageData;
 
 	const refreshPeriodSeconds = 60;
 
@@ -15,7 +20,7 @@
 
 	async function fetchData() {
 		try {
-			const response = await fetch('/api/data');
+			const response = await fetch(`/api/data/${pageData.id}`);
 			const jsonResponse = await response.json();
 
 			if (response.status != 200) {

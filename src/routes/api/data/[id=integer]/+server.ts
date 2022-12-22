@@ -16,9 +16,10 @@ import {
 export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 	const token = `${INFLUXDB_USER}:${INFLUXDB_PASSWORD}`;
 
+	// The "id" parameter is an integer so there is no possible injection.
 	const fluxQuery = `from(bucket:"${INFLUXDB_BUCKET}") 
         |> range(start: -1d)
-        |> filter(fn: (r) => r._measurement == "${INFLUXDB_MEASUREMENT}")
+        |> filter(fn: (r) => r._measurement == "${INFLUXDB_MEASUREMENT}" and r.id == "${params.id}")
         |> movingAverage(n: 60)`;
 
 	return await fetch(`${INFLUXDB_URL}/api/v2/query?org=${INFLUXDB_ORG}`, {
@@ -50,8 +51,8 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 						}
 
 						const time = row[5];
-
 						const field = row[7];
+
 						switch (field) {
 							case INFLUXDB_TEMPERATURE_FIELD:
 								temperature.push({

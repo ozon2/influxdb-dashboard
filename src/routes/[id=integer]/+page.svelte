@@ -69,11 +69,11 @@
 </script>
 
 <div class="main-container">
-	<h1>
-		<img src={thermometerIcon} alt="" style="vertical-align:middle" />
+	<h1 class="mb-5">
+		<img class="emoji" src={thermometerIcon} alt="" />
 		{currentTemp.toFixed(1)} °C
 		<br class="mobile-break" />
-		<img src={dropletIcon} alt="" style="vertical-align:middle; margin-left: 1em" />
+		<img class="emoji ml-10" src={dropletIcon} alt="" />
 		{currentHumidity.toFixed(1)} %
 	</h1>
 
@@ -96,6 +96,11 @@
 		width: min(100% - 3rem, 48rem);
 		height: 50vh;
 		margin: 4.5rem auto;
+	}
+
+	.emoji {
+		display: inline;
+		vertical-align: middle;
 	}
 
 	@media screen and (min-width: 600px) {

@@ -1,4 +1,6 @@
 {
-    "temperature": "Température",
-    "humidity": "Humidité"
+    "Temperature": "Température",
+    "Humidity": "Humidité",
+    "Choose an ID": "Choix de l'identifiant",
+    "Submit": "Valider"
 }

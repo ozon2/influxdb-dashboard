@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { redirect } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
+	import { _ } from 'svelte-i18n';
 
 	// Load data.
 	export let data: PageData;
@@ -34,11 +34,10 @@
 
 
 <div class="main-container">
-	<!-- TODO: i18n -->
-	<h1>Choose a tag</h1>
+	<h1>{$_("Choose an ID")}</h1>
 
 	<form on:submit|preventDefault={handleSubmit}>
-		<select bind:value={selectedId}>
+		<select class="select select-primary" bind:value={selectedId}>
 			{#each ids as id}
 				<option value={id}>
 					{id}
@@ -46,8 +45,8 @@
 			{/each}
 		</select>
 	
-		<button disabled={selectedId == -1} type=submit>
-			Submit
+		<button class="btn btn-primary" disabled={selectedId == -1} type=submit>
+			{$_("Submit")}
 		</button>
 	</form>
 
@@ -65,8 +64,11 @@
 	}
 
 	.main-container {
-		width: min(100% - 3rem, 48rem);
-		height: 50vh;
-		margin: 4.5rem auto;
+		margin: 30vh auto;
+	}
+
+	form {
+		text-align: center;
+		margin-top: 2em;
 	}
 </style>

@@ -28,7 +28,7 @@
 			data: {
 				datasets: [
 					{
-						label: $_('temperature'),
+						label: $_('Temperature'),
 						yAxisID: 'temperature',
 						data: data.temperature,
 						showLine: true,
@@ -40,7 +40,7 @@
 						tension: 1
 					},
 					{
-						label: $_('humidity'),
+						label: $_('Humidity'),
 						yAxisID: 'humidity',
 						data: data.humidity,
 						showLine: true,
@@ -74,14 +74,14 @@
 						},
 						title: {
 							display: true,
-							text: `${$_('temperature')} (°C)`
+							text: `${$_('Temperature')} (°C)`
 						}
 					},
 					humidity: {
 						position: 'right',
 						title: {
 							display: true,
-							text: `${$_('humidity')} (%)`
+							text: `${$_('Humidity')} (%)`
 						}
 					}
 				},

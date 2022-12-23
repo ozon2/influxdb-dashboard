@@ -8,11 +8,11 @@
 	import type { PageData } from './$types';
 
 	// Query parameters.
-	export let pageData: PageData;
+	export let data: PageData;
 
 	const refreshPeriodSeconds = 60;
 
-	let data: ResponseData = {
+	let apiData: ResponseData = {
 		temperature: [],
 		humidity: []
 	};
@@ -20,7 +20,7 @@
 
 	async function fetchData() {
 		try {
-			const response = await fetch(`/api/data/${pageData.id}`);
+			const response = await fetch(`/api/data/${data.id}`);
 			const jsonResponse = await response.json();
 
 			if (response.status != 200) {
@@ -29,7 +29,7 @@
 				return;
 			}
 
-			data = jsonResponse;
+			apiData = jsonResponse;
 			err = '';
 		} catch (error) {
 			err = `Failed to fetch data from API: ${error}`;
@@ -56,14 +56,14 @@
 
 	let currentTemp = 0;
 
-	$: if (data.temperature.length > 0) {
-		currentTemp = data.temperature[data.temperature.length - 1].value;
+	$: if (apiData.temperature.length > 0) {
+		currentTemp = apiData.temperature[apiData.temperature.length - 1].value;
 	}
 
 	let currentHumidity = 0;
 
-	$: if (data.humidity.length > 0) {
-		currentHumidity = data.humidity[data.humidity.length - 1].value;
+	$: if (apiData.humidity.length > 0) {
+		currentHumidity = apiData.humidity[apiData.humidity.length - 1].value;
 	}
 </script>
 
@@ -76,7 +76,7 @@
 		{currentHumidity.toFixed(1)} %
 	</h1>
 
-	<Chart {data} />
+	<Chart data={apiData} />
 
 	{#if err}
 		<p>

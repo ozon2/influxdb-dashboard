@@ -34,11 +34,11 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 		.then((response) => {
 			return response.text();
 		})
-		.then((csv) => {
+		.then((text) => {
 			let temperature: InfluxDBPoint[] = [];
 			let humidity: InfluxDBPoint[] = [];
 
-			Papa.parse<InfluxDBRow>(csv, {
+			Papa.parse<InfluxDBRow>(text, {
 				complete: (results) => {
 					for (const row of results.data) {
 						if (!Array.isArray(row) || row.length < 7) {
@@ -70,6 +70,11 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 					}
 				}
 			});
+
+			// If the list is empty, there was probably an error.
+			if (temperature.length == 0) {
+				throw text
+			}
 
 			return json({ temperature, humidity });
 		})

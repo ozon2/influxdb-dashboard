@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { addMessages, getLocaleFromNavigator, init, locale, waitLocale } from 'svelte-i18n';
-import type { LayoutLoad } from './$types'
+import type { LayoutLoad } from './$types';
 import fr from '$lib/i18n/fr.json';
 import en from '$lib/i18n/en.json';
 
@@ -20,8 +20,8 @@ if (browser) {
 // Wait for the locale to be set before rendering.
 export const load: LayoutLoad = async () => {
 	if (browser) {
-		locale.set(getLocaleFromNavigator())
+		locale.set(getLocaleFromNavigator());
 	}
 
-	await waitLocale()
-}
+	await waitLocale();
+};

@@ -7,8 +7,8 @@
 	// Load data.
 	export let data: PageData;
 
-	let ids: number[] = []
-	let err = ""
+	let ids: number[] = [];
+	let err = '';
 	let selectedId = -1;
 
 	async function processIds() {
@@ -19,7 +19,7 @@
 		ids = await data.response.json();
 
 		if (ids.length > 0) {
-			selectedId = ids[0]
+			selectedId = ids[0];
 		}
 	}
 
@@ -28,13 +28,12 @@
 	});
 
 	function handleSubmit() {
-		goto(`/${selectedId}`)
+		goto(`/${selectedId}`);
 	}
 </script>
 
-
 <div class="main-container">
-	<h1>{$_("Choose an ID")}</h1>
+	<h1>{$_('Choose an ID')}</h1>
 
 	<form on:submit|preventDefault={handleSubmit}>
 		<select class="select select-primary" bind:value={selectedId}>
@@ -44,9 +43,9 @@
 				</option>
 			{/each}
 		</select>
-	
-		<button class="btn btn-primary" disabled={selectedId == -1} type=submit>
-			{$_("Submit")}
+
+		<button class="btn btn-primary" disabled={selectedId == -1} type="submit">
+			{$_('Submit')}
 		</button>
 	</form>
 

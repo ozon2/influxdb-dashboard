@@ -1,15 +1,12 @@
 import { json, error } from '@sveltejs/kit';
-import type { RequestEvent, RequestHandler } from './$types';
-import type { InfluxDBPoint, InfluxDBRow } from '$lib/types';
+import type { RequestHandler } from './$types';
+import type { InfluxDBRow } from '$lib/types';
 import Papa from 'papaparse';
-import {
-	INFLUXDB_BUCKET,
-	INFLUXDB_MEASUREMENT,
-} from '$env/static/private';
+import { INFLUXDB_BUCKET, INFLUXDB_MEASUREMENT } from '$env/static/private';
 import { Query } from '$lib/influxdb';
 
 // List available sensor id tags.
-export const GET: RequestHandler = async ({ params }: RequestEvent) => {
+export const GET: RequestHandler = async () => {
 	// The "id" parameter is an integer so there is no possible injection.
 	const fluxQuery = `from(bucket:"${INFLUXDB_BUCKET}") 
         |> range(start: -5m)
@@ -24,7 +21,7 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 		throw error(500, message);
 	});
 
-	const textResp = await response.text()
+	const textResp = await response.text();
 
 	if (response.status != 200) {
 		const message = `Failed to fetch data from InfluxDB: ${textResp}`;
@@ -33,7 +30,7 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 		throw error(500, message);
 	}
 
-    let ids : number[] = [];
+	const ids: number[] = [];
 
 	Papa.parse<InfluxDBRow>(textResp, {
 		complete: (results) => {
@@ -42,19 +39,15 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 					continue;
 				}
 
-                const id = parseFloat(row[6]);
+				const id = parseFloat(row[6]);
 				if (!id) {
 					continue;
 				}
 
-                ids.push(id)
+				ids.push(id);
 			}
 		}
 	});
 
-	// TODO: remove
-	ids.push(5)
-	ids.push(6)
-
-	return json(ids);		
+	return json(ids);
 };

@@ -3,21 +3,14 @@ import type { RequestEvent, RequestHandler } from './$types';
 import type { InfluxDBPoint, InfluxDBRow } from '$lib/types';
 import Papa from 'papaparse';
 import {
-	INFLUXDB_URL,
-	INFLUXDB_ORG,
-	INFLUXDB_USER,
-	INFLUXDB_PASSWORD,
 	INFLUXDB_BUCKET,
 	INFLUXDB_MEASUREMENT,
 	INFLUXDB_TEMPERATURE_FIELD,
 	INFLUXDB_HUMIDITY_FIELD
 } from '$env/static/private';
 import { Query } from '$lib/influxdb';
-import { text } from 'svelte/internal';
 
 export const GET: RequestHandler = async ({ params }: RequestEvent) => {
-	const token = `${INFLUXDB_USER}:${INFLUXDB_PASSWORD}`;
-
 	// The "id" parameter is an integer so there is no possible injection.
 	const fluxQuery = `from(bucket:"${INFLUXDB_BUCKET}") 
         |> range(start: -1d)
@@ -31,7 +24,7 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 		throw error(500, message);
 	});
 
-	const textResp = await response.text()
+	const textResp = await response.text();
 
 	if (response.status != 200) {
 		const message = `Failed to fetch data from InfluxDB: ${textResp}`;
@@ -40,8 +33,8 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 		throw error(500, message);
 	}
 
-	let temperature: InfluxDBPoint[] = [];
-	let humidity: InfluxDBPoint[] = [];
+	const temperature: InfluxDBPoint[] = [];
+	const humidity: InfluxDBPoint[] = [];
 
 	Papa.parse<InfluxDBRow>(textResp, {
 		complete: (results) => {
@@ -76,5 +69,5 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 		}
 	});
 
-	return json({ temperature, humidity });		
+	return json({ temperature, humidity });
 };

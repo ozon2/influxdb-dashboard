@@ -2,12 +2,11 @@
 	import type { ResponseData } from '$lib/types';
 	import Chart from './Chart.svelte';
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
 	import thermometerIcon from '$lib/images/thermometer.png';
 	import dropletIcon from '$lib/images/droplet.png';
 	import type { PageData } from './$types';
 
-	// Query parameters.
+	// Load data.
 	export let data: PageData;
 
 	const refreshPeriodSeconds = 60;
@@ -21,6 +20,8 @@
 	async function fetchData() {
 		try {
 			const response = await fetch(`/api/data/${data.id}`);
+
+			// TODO: get error message before converting to json as it can fail.
 			const jsonResponse = await response.json();
 
 			if (response.status != 200) {
@@ -86,17 +87,7 @@
 </div>
 
 <style>
-	/* Use Roboto font. */
-	@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-
-	:global(body) {
-		background-color: #121212;
-		color: #ffffff;
-		font-family: 'Roboto', sans-serif;
-	}
-
 	h1 {
-		color: var(--colour-dark);
 		font-size: 3rem;
 		text-align: center;
 	}

@@ -3,26 +3,19 @@ import type { RequestEvent, RequestHandler } from './$types';
 import type { InfluxDBPoint, InfluxDBRow } from '$lib/types';
 import Papa from 'papaparse';
 import {
-	INFLUXDB_URL,
-	INFLUXDB_ORG,
-	INFLUXDB_USER,
-	INFLUXDB_PASSWORD,
 	INFLUXDB_BUCKET,
 	INFLUXDB_MEASUREMENT,
-	INFLUXDB_TEMPERATURE_FIELD,
-	INFLUXDB_HUMIDITY_FIELD
 } from '$env/static/private';
 import { Query } from '$lib/influxdb';
-import { text } from 'svelte/internal';
 
+// List available sensor id tags.
 export const GET: RequestHandler = async ({ params }: RequestEvent) => {
-	const token = `${INFLUXDB_USER}:${INFLUXDB_PASSWORD}`;
-
 	// The "id" parameter is an integer so there is no possible injection.
 	const fluxQuery = `from(bucket:"${INFLUXDB_BUCKET}") 
-        |> range(start: -1d)
-        |> filter(fn: (r) => r._measurement == "${INFLUXDB_MEASUREMENT}" and r.id == "${params.id}")
-        |> movingAverage(n: 60)`;
+        |> range(start: -5m)
+        |> filter(fn: (r) => r._measurement == "${INFLUXDB_MEASUREMENT}")
+        |> group(columns: ["id"])
+        |> distinct(column: "id")`;
 
 	const response = await Query(fluxQuery).catch((err) => {
 		const message = `Failed to fetch data from InfluxDB: ${err}`;
@@ -40,8 +33,7 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 		throw error(500, message);
 	}
 
-	let temperature: InfluxDBPoint[] = [];
-	let humidity: InfluxDBPoint[] = [];
+    let ids : number[] = [];
 
 	Papa.parse<InfluxDBRow>(textResp, {
 		complete: (results) => {
@@ -50,31 +42,19 @@ export const GET: RequestHandler = async ({ params }: RequestEvent) => {
 					continue;
 				}
 
-				const value = row[6];
-				if (isNaN(Number(value))) {
+                const id = parseFloat(row[6]);
+				if (!id) {
 					continue;
 				}
 
-				const time = row[5];
-				const field = row[7];
-
-				switch (field) {
-					case INFLUXDB_TEMPERATURE_FIELD:
-						temperature.push({
-							time: time,
-							value: parseFloat(value)
-						});
-						break;
-					case INFLUXDB_HUMIDITY_FIELD:
-						humidity.push({
-							time: time,
-							value: parseFloat(value)
-						});
-						break;
-				}
+                ids.push(id)
 			}
 		}
 	});
 
-	return json({ temperature, humidity });		
+	// TODO: remove
+	ids.push(5)
+	ids.push(6)
+
+	return json(ids);		
 };

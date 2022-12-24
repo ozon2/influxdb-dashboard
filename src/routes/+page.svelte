@@ -1,31 +1,16 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { onMount } from 'svelte';
 	import type { PageData } from './$types';
 	import { _ } from 'svelte-i18n';
 
 	// Load data.
 	export let data: PageData;
 
-	let ids: number[] = [];
-	let err = '';
 	let selectedId = -1;
 
-	async function processIds() {
-		if (data.response.status != 200) {
-			err = await data.response.text();
-		}
-
-		ids = await data.response.json();
-
-		if (ids.length > 0) {
-			selectedId = ids[0];
-		}
+	if (data.ids.length > 0) {
+		selectedId = data.ids[0];
 	}
-
-	onMount(() => {
-		processIds();
-	});
 
 	function handleSubmit() {
 		goto(`/${selectedId}`);
@@ -38,7 +23,7 @@
 	<form on:submit|preventDefault={handleSubmit}>
 		<div class="select is-primary">
 			<select bind:value={selectedId}>
-				{#each ids as id}
+				{#each data.ids as id}
 					<option value={id}>
 						{id}
 					</option>
@@ -49,13 +34,13 @@
 		<button class="button is-primary" disabled={selectedId == -1} type="submit">
 			{$_('Submit')}
 		</button>
-	</form>
 
-	{#if err}
-		<p>
-			Error: {err}
-		</p>
-	{/if}
+		{#if data.err}
+			<p class="mt-3">
+				Error: {data.err}
+			</p>
+		{/if}
+	</form>
 </div>
 
 <style>

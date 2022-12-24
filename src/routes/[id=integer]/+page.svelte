@@ -73,7 +73,7 @@
 		<img class="emoji" src={thermometerIcon} alt="" />
 		{currentTemp.toFixed(1)} °C
 		<br class="mobile-break" />
-		<img class="emoji ml-10" src={dropletIcon} alt="" />
+		<img class="emoji ml-6" src={dropletIcon} alt="" />
 		{currentHumidity.toFixed(1)} %
 	</h1>
 

@@ -36,15 +36,17 @@
 	<h1>{$_('Choose an ID')}</h1>
 
 	<form on:submit|preventDefault={handleSubmit}>
-		<select class="select select-primary" bind:value={selectedId}>
-			{#each ids as id}
-				<option value={id}>
-					{id}
-				</option>
-			{/each}
-		</select>
+		<div class="select is-primary">
+			<select bind:value={selectedId}>
+				{#each ids as id}
+					<option value={id}>
+						{id}
+					</option>
+				{/each}
+			</select>
+		</div>
 
-		<button class="btn btn-primary" disabled={selectedId == -1} type="submit">
+		<button class="button is-primary" disabled={selectedId == -1} type="submit">
 			{$_('Submit')}
 		</button>
 	</form>

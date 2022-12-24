@@ -5,6 +5,13 @@ const config: UserConfig = {
 	plugins: [sveltekit()],
 	ssr: {
 		noExternal: ['chart.js']
+	},
+	css: {
+		preprocessorOptions: {
+			scss: {
+				additionalData: '@use "src/variables.scss" as *;'
+			}
+		}
 	}
 };
 
